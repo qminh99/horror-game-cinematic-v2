@@ -4,19 +4,20 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
+import { GAME_CONFIG } from '../config/contract.js';
 
 export function createCinematicRenderer(scene, camera) {
   const renderer = new THREE.WebGLRenderer({
-    antialias: false,
+    antialias: true,
     powerPreference: 'high-performance'
   });
 
-  renderer.setPixelRatio(1);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.shadowMap.enabled = false;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.05;
+  renderer.toneMappingExposure = 1.08;
   document.body.appendChild(renderer.domElement);
 
   const composer = new EffectComposer(renderer);
@@ -27,9 +28,9 @@ export function createCinematicRenderer(scene, camera) {
   const bloomHeight = Math.max(1, Math.floor(window.innerHeight / 2));
   const bloomPass = new UnrealBloomPass(
     new THREE.Vector2(bloomWidth, bloomHeight),
-    0.24,
+    0.22,
     0.45,
-    0.85
+    0.86
   );
   composer.addPass(bloomPass);
 
@@ -39,6 +40,7 @@ export function createCinematicRenderer(scene, camera) {
   const pmremGenerator = new THREE.PMREMGenerator(renderer);
   pmremGenerator.compileEquirectangularShader();
 
+  let bloomEnabled = Boolean(GAME_CONFIG.enableBloomByDefault);
   let lastBlurPx = -1;
 
   async function loadEnvironmentHdri(url) {
@@ -47,15 +49,23 @@ export function createCinematicRenderer(scene, camera) {
       const texture = await loader.loadAsync(url);
       const envMap = pmremGenerator.fromEquirectangular(texture).texture;
       scene.environment = envMap;
-      scene.environmentIntensity = 0.65;
+      scene.environmentIntensity = 0.55;
       texture.dispose();
       return { ok: true, message: 'HDRI đã nạp: ' + url };
     } catch (error) {
-      const fallbackLight = new THREE.HemisphereLight(0xb8c8de, 0x242830, 0.75);
+      const fallbackLight = new THREE.HemisphereLight(0xb8c8de, 0x242830, 0.7);
       fallbackLight.name = 'Fallback_Environment_Hemi';
       scene.add(fallbackLight);
-      return { ok: false, message: 'Chưa có HDRI (' + url + '), đang dùng ánh sáng môi trường tạm.' };
+      return { ok: false, message: 'Chưa có HDRI (' + url + '), dùng ánh sáng môi trường chuẩn.' };
     }
+  }
+
+  function setBloomEnabled(enabled) {
+    bloomEnabled = Boolean(enabled);
+  }
+
+  function isBloomEnabled() {
+    return bloomEnabled;
   }
 
   function setOpticalBlur(blurAmount) {
@@ -85,13 +95,19 @@ export function createCinematicRenderer(scene, camera) {
   }
 
   function render() {
-    composer.render();
+    if (bloomEnabled) {
+      composer.render();
+    } else {
+      renderer.render(scene, camera);
+    }
   }
 
   return {
     renderer,
     composer,
     loadEnvironmentHdri,
+    setBloomEnabled,
+    isBloomEnabled,
     setOpticalBlur,
     resize,
     render

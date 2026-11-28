@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>SEGFAULT: Ngõ 165 — Cinematic Engine</title>
+  <title>SEGFAULT: Ngõ 165 — Khu Phố & Nhà Tập Thể B1</title>
   <style>
     * { box-sizing: border-box; }
     html, body {
@@ -14,6 +14,7 @@
       background: #06090d;
       color: #ece9e2;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      user-select: none;
     }
     canvas {
       display: block;
@@ -29,9 +30,9 @@
       background: radial-gradient(ellipse at center, rgba(16, 24, 34, 0.86), rgba(4, 7, 10, 0.98) 78%);
     }
     #start-card {
-      width: min(560px, calc(100vw - 32px));
+      width: min(580px, calc(100vw - 32px));
       padding: 32px;
-      background: rgba(11, 16, 22, 0.94);
+      background: rgba(11, 16, 22, 0.95);
       border: 1px solid rgba(215, 224, 232, 0.16);
       box-shadow: 0 24px 64px rgba(0, 0, 0, 0.65);
     }
@@ -39,7 +40,7 @@
       font-size: 11px;
       letter-spacing: 0.22em;
       text-transform: uppercase;
-      color: #9cb2c4;
+      color: #c8a97e;
     }
     h1 {
       margin: 10px 0 12px;
@@ -53,18 +54,34 @@
       color: #b7c0c8;
       font-size: 14px;
     }
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
     button {
       border: 0;
-      background: #dce6ee;
+      background: #e4d4b7;
       color: #0b1117;
       padding: 12px 22px;
       font-size: 13px;
       font-weight: 700;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.08em;
       cursor: pointer;
     }
-    button:hover {
-      background: #ffffff;
+    button:hover:not(:disabled) {
+      background: #f5ebd8;
+    }
+    button.secondary {
+      background: rgba(255, 255, 255, 0.07);
+      color: #ced8e2;
+      border: 1px solid rgba(215, 224, 232, 0.2);
+      font-weight: 600;
+    }
+    button.secondary:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.14);
+      color: #ffffff;
     }
     button:disabled {
       opacity: 0.45;
@@ -79,7 +96,7 @@
       font-size: 12px;
       line-height: 1.6;
       color: #a4b1bc;
-      max-height: 180px;
+      max-height: 190px;
       overflow-y: auto;
       white-space: pre-wrap;
     }
@@ -96,7 +113,7 @@
       inset: 0;
       z-index: 8;
       pointer-events: none;
-      background: radial-gradient(ellipse at center, transparent 54%, rgba(2, 5, 10, 0.56) 100%);
+      background: radial-gradient(ellipse at center, transparent 56%, rgba(2, 5, 10, 0.52) 100%);
     }
     #subtitle {
       position: fixed;
@@ -125,39 +142,141 @@
       text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
       pointer-events: none;
     }
-    #intro-hud[hidden] {
+    #intro-hud[hidden],
+    #gameplay-hud[hidden],
+    #pause-bar[hidden] {
       display: none;
+    }
+    #gameplay-hud {
+      position: fixed;
+      inset: 0;
+      z-index: 11;
+      pointer-events: none;
+    }
+    #location-badge {
+      position: absolute;
+      top: 18px;
+      left: 20px;
+      padding: 8px 14px;
+      background: rgba(10, 14, 20, 0.78);
+      border: 1px solid rgba(228, 212, 183, 0.22);
+      border-left: 3px solid #d4aa6e;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #f0e8da;
+    }
+    #crosshair {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(242, 238, 228, 0.82);
+      box-shadow: 0 0 6px rgba(0, 0, 0, 0.9);
+      transition: transform 0.12s ease, background-color 0.12s ease;
+    }
+    #crosshair.active {
+      transform: translate(-50%, -50%) scale(1.8);
+      background: #f5cd85;
+      box-shadow: 0 0 10px rgba(245, 205, 133, 0.8);
+    }
+    #interact-prompt {
+      position: absolute;
+      left: 50%;
+      bottom: 14%;
+      transform: translateX(-50%);
+      padding: 9px 16px;
+      background: rgba(8, 12, 18, 0.86);
+      border: 1px solid rgba(228, 212, 183, 0.36);
+      color: #f4ece0;
+      font-size: 13px;
+      letter-spacing: 0.03em;
+      display: none;
+    }
+    #gameplay-controls {
+      position: absolute;
+      right: 20px;
+      bottom: 16px;
+      padding: 7px 12px;
+      background: rgba(8, 12, 18, 0.62);
+      border: 1px solid rgba(215, 224, 232, 0.12);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 11px;
+      color: rgba(216, 224, 232, 0.78);
+    }
+    #pause-bar {
+      position: fixed;
+      top: 18px;
+      right: 20px;
+      z-index: 16;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 12px;
+      background: rgba(10, 14, 20, 0.9);
+      border: 1px solid rgba(228, 212, 183, 0.25);
+    }
+    #pause-bar span {
+      font-size: 12px;
+      color: #c2ccd6;
+      margin-right: 6px;
+    }
+    #pause-bar button {
+      padding: 7px 12px;
+      font-size: 11px;
     }
     #debug-bar {
       position: fixed;
-      left: 16px;
-      top: 14px;
+      left: 20px;
+      top: 62px;
       z-index: 14;
       padding: 8px 12px;
-      background: rgba(8, 12, 18, 0.78);
+      background: rgba(8, 12, 18, 0.8);
       border: 1px solid rgba(215, 224, 232, 0.15);
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
       font-size: 11px;
       color: #c2ced8;
       pointer-events: none;
       display: none;
+      white-space: pre;
     }
   </style>
 </head>
 <body>
   <div id="start-screen">
     <div id="start-card">
-      <div class="eyebrow">FIRST-PERSON CINEMATIC PIPELINE · GLB + PBR + HDRI</div>
-      <h1>SEGFAULT: Ngõ 165</h1>
-      <p>Hệ thống render điện ảnh Three.js đọc trực tiếp tài nguyên 3D (.glb), ánh sáng HDRI và hoạt ảnh xương xuất từ Blender.</p>
-      <button id="start-btn" type="button" disabled>ĐANG KIỂM TRA ASSETS...</button>
+      <div class="eyebrow">SEGFAULT: NGÕ 165 · GAMEPLAY KHU PHỐ & NHÀ TẬP THỂ B1</div>
+      <h1>Khu tập thể B1 — Đêm</h1>
+      <p>Khám phá khu phố đêm, đi lại qua các con ngõ giữa dãy nhà và bước vào tòa tập thể cũ B1 (3 tầng, mỗi tầng 2 phòng). Intro xe buýt tạm thời không tự phát khi vào game nhưng vẫn được giữ nguyên.</p>
+      <div class="btn-row">
+        <button id="play-btn" type="button" disabled>ĐANG CHUẨN BỊ KHU PHỐ...</button>
+        <button id="watch-intro-btn" class="secondary" type="button">XEM LẠI INTRO</button>
+      </div>
       <div id="asset-status">Đang khởi tạo...</div>
     </div>
   </div>
+
   <div id="cinematic-vignette"></div>
   <div id="eyelid-veil"></div>
   <div id="subtitle" role="status"></div>
   <div id="intro-hud" hidden>SPACE · BỎ QUA INTRO &nbsp;|&nbsp; D · BẬT/TẮT DEBUG</div>
+
+  <div id="gameplay-hud" hidden>
+    <div id="location-badge">Khu phố Ngõ 165</div>
+    <div id="crosshair"></div>
+    <div id="interact-prompt"></div>
+    <div id="gameplay-controls">WASD Di chuyển · Shift Chạy · E Tương tác · Space Nhảy · B Bloom · ` Debug · Esc Thả chuột</div>
+  </div>
+
+  <div id="pause-bar" hidden>
+    <span>Nhấp vào màn hình để khóa chuột</span>
+    <button id="resume-btn" type="button">TIẾP TỤC</button>
+    <button id="menu-btn" class="secondary" type="button">MENU</button>
+  </div>
+
   <div id="debug-bar"></div>
   <script type="module" src="/src/main.js"></script>
 </body>

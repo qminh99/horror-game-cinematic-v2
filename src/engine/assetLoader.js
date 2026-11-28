@@ -14,7 +14,10 @@ const DRACO_FILES = new Map([
 export function createAssetLoader() {
   const gltfLoader = new GLTFLoader();
   const dracoManager = new THREE.LoadingManager();
-  dracoManager.setURLModifier((url) => DRACO_FILES.get(url) ?? url);
+  dracoManager.setURLModifier(function (url) {
+    const mapped = DRACO_FILES.get(url);
+    return mapped !== undefined ? mapped : url;
+  });
   const dracoLoader = new DRACOLoader(dracoManager);
   gltfLoader.setDRACOLoader(dracoLoader);
 
@@ -34,7 +37,7 @@ export function createAssetLoader() {
       convertedGlass = true;
     }
     if (material.isMeshStandardMaterial) {
-      material.envMapIntensity = 0.9;
+      material.envMapIntensity = 0.85;
     }
     return convertedGlass;
   }
@@ -76,16 +79,17 @@ export function createAssetLoader() {
         }
       });
 
-      console.log('[GLB STATS]', url, {
+      const stats = {
         meshes: meshCount,
         triangles: triangleCount,
         lights: lightCount,
         glassTransmissionDisabled: glassConvertedCount
-      });
+      };
+      console.log('[GLB STATS]', url, stats);
 
-      return { ok: true, gltf: gltf, error: null };
+      return { ok: true, gltf: gltf, stats: stats, error: null };
     } catch (error) {
-      return { ok: false, gltf: null, error: error };
+      return { ok: false, gltf: null, stats: null, error: error };
     }
   }
 
@@ -117,8 +121,49 @@ export function createAssetLoader() {
     };
   }
 
+  function validateNeighborhoodContract(gltf, contract) {
+    const hasSpawn = Boolean(gltf.scene.getObjectByName(contract.spawnNodeName));
+    let walkCount = 0;
+    let rampCount = 0;
+    let colliderCount = 0;
+    let doorCount = 0;
+    let switchCount = 0;
+
+    gltf.scene.traverse(function (node) {
+      if (!node.name) {
+        return;
+      }
+      if (node.name.startsWith(contract.stairRampPrefix)) {
+        rampCount += 1;
+        walkCount += 1;
+      } else if (node.name.startsWith(contract.walkPrefix)) {
+        walkCount += 1;
+      }
+      if (node.name.startsWith(contract.colliderPrefix)) {
+        colliderCount += 1;
+      }
+      if (node.name.startsWith(contract.doorPrefix)) {
+        doorCount += 1;
+      }
+      if (node.name.startsWith(contract.switchPrefix)) {
+        switchCount += 1;
+      }
+    });
+
+    return {
+      valid: hasSpawn && walkCount > 0 && colliderCount > 0,
+      hasSpawn: hasSpawn,
+      walkCount: walkCount,
+      rampCount: rampCount,
+      colliderCount: colliderCount,
+      doorCount: doorCount,
+      switchCount: switchCount
+    };
+  }
+
   return {
     loadGlb,
-    validateContract
+    validateContract,
+    validateNeighborhoodContract
   };
 }

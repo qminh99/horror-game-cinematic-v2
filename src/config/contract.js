@@ -1,9 +1,27 @@
+export const GAME_CONFIG = {
+  playIntroOnStart: false,
+  enableBloomByDefault: false
+};
+
 export const ASSET_PATHS = {
+  neighborhoodWorld: '/assets/models/neighborhood_world.glb',
   introMaster: '/assets/models/intro_master.glb',
   huyRoommate: '/assets/models/huy_roommate.glb',
   vnuJacket: '/assets/models/vnu_jacket.glb',
   fpGameplayHands: '/assets/models/fp_gameplay_hands.glb',
   nightHdri: '/assets/hdri/night_street_1k.hdr'
+};
+
+export const NEIGHBORHOOD_CONTRACT = {
+  spawnNodeName: 'SPAWN_Player',
+  walkPrefix: 'WALK_',
+  stairRampPrefix: 'WALK_StairRamp_',
+  colliderPrefix: 'COL_',
+  proxyColliderPrefix: 'COL_Proxy_',
+  boundColliderPrefix: 'COL_Bound_',
+  doorPrefix: 'INTERACT_Door_',
+  switchPrefix: 'INTERACT_Switch_',
+  zonePrefix: 'ZONE_'
 };
 
 export const INTRO_CONTRACT = {
