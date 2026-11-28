@@ -21,15 +21,12 @@ def prepare_web_materials():
         if not shader:
             continue
         transmission = shader.inputs.get('Transmission Weight') or shader.inputs.get('Transmission')
-        if transmission and transmission.default_value > 0:
+        if transmission and (transmission.is_linked or transmission.default_value > 0):
+            for link in list(transmission.links):
+                tree.links.remove(link)
             transmission.default_value = 0.0
             shader.inputs['Alpha'].default_value = 0.22
             material.surface_render_method = 'BLENDED'
-        color = shader.inputs.get('Base Color')
-        if color and color.is_linked and color.links[0].from_node.type == 'VALTORGB':
-            ramp = color.links[0].from_node.color_ramp
-            color.default_value = ramp.evaluate(0.5)
-            tree.links.remove(color.links[0])
 
 
 def export_neighborhood():
@@ -63,7 +60,11 @@ def export_neighborhood():
         export_animations=False,
         use_selection=True,
         export_materials='EXPORT',
+        # Keep both UV sets: tiled PBR uses UV0, static gallery lighting uses UV1.
+        export_texcoords=True,
+        export_normals=True,
         export_image_format='WEBP',
+        export_image_quality=74,
         export_draco_mesh_compression_enable=True,
         export_draco_mesh_compression_level=6
     )

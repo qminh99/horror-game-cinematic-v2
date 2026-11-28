@@ -1,6 +1,6 @@
 {
   "asset": "public/assets/models/neighborhood_world.glb",
-  "bytes": 1689780,
+  "bytes": 6969308,
   "triangles_including_collision": 200495,
   "street_length_m": 75,
   "lights": {
@@ -9,7 +9,7 @@
   },
   "transmission_material_count": 0,
   "compression": "KHR_draco_mesh_compression",
-  "sha256": "50b558b5d540c3a0748957c2fb69149fd24600cfc4b5471dcf05c359e5484d42",
+  "sha256": "2f934535441fc749fdc4bb32562c39736bd936b1cf0237d7788160aa51aefcc4",
   "SPAWN_Player": {
     "blender_xyz_m": [
       14.9,
@@ -167,5 +167,115 @@
       "INTERACT_Switch_301",
       "INTERACT_Switch_302"
     ]
-  }
+  },
+  "embedded_images": [
+    {
+      "name": "Neighbor_Limewash_NormalGL",
+      "width": 2048,
+      "height": 2048,
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "Neighbor_Limewash_BaseColor",
+      "width": 2048,
+      "height": 2048,
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "Neighbor_Limewash_MetalRough",
+      "width": 2048,
+      "height": 2048,
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "B1_GalleryLight",
+      "width": 1152,
+      "height": 1152,
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "B1_Render_NormalGL",
+      "width": 2048,
+      "height": 2048,
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "B1_ContactAO",
+      "width": 2304,
+      "height": 2304,
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "B1_Render_BaseColor",
+      "width": 2048,
+      "height": 2048,
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "B1_Render_MetalRough",
+      "width": 2048,
+      "height": 2048,
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "Stair_Concrete_NormalGL",
+      "width": 2048,
+      "height": 2048,
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "Stair_Concrete_BaseColor",
+      "width": 2048,
+      "height": 2048,
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "Stair_Concrete_MetalRough",
+      "width": 2048,
+      "height": 2048,
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "Roof • zinc | surface",
+      "width": 256,
+      "height": 256,
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "Sidewalk_Pavers_NormalGL",
+      "width": 2048,
+      "height": 2048,
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "Sidewalk_Pavers_BaseColor",
+      "width": 2048,
+      "height": 2048,
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "Sidewalk_Pavers_MetalRough",
+      "width": 2048,
+      "height": 2048,
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "Wet_Asphalt_NormalGL",
+      "width": 2048,
+      "height": 2048,
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "Wet_Asphalt_BaseColor",
+      "width": 2048,
+      "height": 2048,
+      "mimeType": "image/webp"
+    },
+    {
+      "name": "Wet_Asphalt_MetalRough",
+      "width": 2048,
+      "height": 2048,
+      "mimeType": "image/webp"
+    }
+  ]
 }
