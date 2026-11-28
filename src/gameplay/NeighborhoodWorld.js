@@ -82,7 +82,7 @@ export function createNeighborhoodWorld(scene) {
           type: 'door',
           node: node,
           meshes: meshes,
-          colliderMesh: node.userData.colliderMesh || meshes[0] || null,
+          colliderMesh: node.userData.colliderMesh || meshes.find(mesh => mesh.name.startsWith('DoorSolid_')) || meshes[0] || null,
           label: label,
           closedRotY: closedRotY,
           openAngle: openAngle,
@@ -173,7 +173,8 @@ export function createNeighborhoodWorld(scene) {
     }
   }
 
-  function getZoneLabel(position) {
+  function getZoneLabel(position, flashlightOn = false) {
+    if (position.y <= -0.8) return flashlightOn ? 'Tầng hầm B1' : 'Tầng hầm B1 · Nhấn F bật đèn pin';
     const x = position.x;
     const y = position.y;
     const z = position.z;

@@ -45,6 +45,7 @@ export function createAssetLoader() {
   async function loadGlb(url) {
     try {
       const gltf = await gltfLoader.loadAsync(url);
+      const isNeighborhood = Boolean(gltf.scene.getObjectByName('SPAWN_Player'));
       let meshCount = 0;
       let lightCount = 0;
       let triangleCount = 0;
@@ -53,8 +54,15 @@ export function createAssetLoader() {
       gltf.scene.traverse(function (node) {
         if (node.isMesh) {
           meshCount += 1;
-          node.castShadow = false;
-          node.receiveShadow = false;
+          // GLTFLoader splits multi-material geometry into children of the named Blender node.
+          let owner = node;
+          while (owner.parent && owner.parent !== gltf.scene && !owner.parent.isScene) {
+            if (/^(Detail_|Dressing_|Set_|Trash_|Flakes_|Decal_|COL_|WALK_|DoorSolid_|INTERACT_|PROP_)/.test(owner.name)) break;
+            owner = owner.parent;
+          }
+          const excluded = /^(COL_Proxy|COL_Bound|WALK_StairRamp|DoorSolid_|Trash_|Flakes_|Decal_|Detail_(District|Trees|Cables))/.test(owner.name);
+          node.receiveShadow = isNeighborhood && !/^(COL_Proxy|COL_Bound|WALK_StairRamp|DoorSolid_)/.test(owner.name);
+          node.castShadow = isNeighborhood && !excluded;
           if (node.geometry) {
             if (node.geometry.index) {
               triangleCount += Math.floor(node.geometry.index.count / 3);

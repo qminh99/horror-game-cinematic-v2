@@ -9,6 +9,8 @@ import { createNeighborhoodWorld } from './gameplay/NeighborhoodWorld.js';
 import { createFirstPersonController } from './gameplay/FirstPersonController.js';
 import { createInteractionController } from './gameplay/InteractionController.js';
 
+import { createFlashlightController } from './gameplay/FlashlightController.js';
+
 const startScreen = document.getElementById('start-screen');
 const playBtn = document.getElementById('play-btn');
 const watchIntroBtn = document.getElementById('watch-intro-btn');
@@ -105,6 +107,8 @@ const neighborhoodWorld = createNeighborhoodWorld(scene);
 const fpController = createFirstPersonController(camera, cinematicRenderer.renderer.domElement, neighborhoodWorld);
 const interactionController = createInteractionController(camera, neighborhoodWorld, ui);
 
+const flashlight = createFlashlightController(scene, camera, neighborhoodWorld);
+
 fpController.onPointerLockChange(function (locked) {
   if (mode === 'gameplay') {
     pauseBarEl.hidden = locked;
@@ -127,6 +131,7 @@ function enterGameplay(resetPosition) {
   }
   fpController.setEnabled(true);
   interactionController.setEnabled(true);
+  flashlight.setEnabled(true);
   fpController.requestPointerLock();
   pauseBarEl.hidden = fpController.isPointerLocked();
 }
@@ -135,6 +140,7 @@ function returnToMenu() {
   mode = 'menu';
   fpController.setEnabled(false);
   interactionController.setEnabled(false);
+  flashlight.setEnabled(false);
   ui.showGameplayHud(false);
   ui.showIntroHud(false);
   pauseBarEl.hidden = true;
@@ -180,6 +186,7 @@ async function startIntro() {
   pauseBarEl.hidden = true;
   fpController.setEnabled(false);
   interactionController.setEnabled(false);
+  flashlight.setEnabled(false);
   ui.showGameplayHud(false);
   neighborhoodWorld.setVisible(false);
   busIntro.start(function () {
@@ -282,7 +289,8 @@ function animate() {
     interactionController.update(dt);
     dormCharacters.update(dt);
     const pos = fpController.getPosition();
-    ui.setLocationLabel(neighborhoodWorld.getZoneLabel(pos));
+    flashlight.update(dt, pos);
+    ui.setLocationLabel(neighborhoodWorld.getZoneLabel(pos, flashlight.isOn()));
     if (debugVisible) {
       ui.setDebugText(
         'FPS: ' + currentFps + ' | BLOOM: ' + (cinematicRenderer.isBloomEnabled() ? 'ON' : 'OFF') + '\n' +
