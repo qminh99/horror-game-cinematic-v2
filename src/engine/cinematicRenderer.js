@@ -49,11 +49,11 @@ export function createCinematicRenderer(scene, camera) {
       const texture = await loader.loadAsync(url);
       const envMap = pmremGenerator.fromEquirectangular(texture).texture;
       scene.environment = envMap;
-      scene.environmentIntensity = 0.55;
+      scene.environmentIntensity = 0.18;
       texture.dispose();
       return { ok: true, message: 'HDRI đã nạp: ' + url };
     } catch (error) {
-      const fallbackLight = new THREE.HemisphereLight(0xb8c8de, 0x242830, 0.7);
+      const fallbackLight = new THREE.HemisphereLight(0xb8c8de, 0x242830, 0.22);
       fallbackLight.name = 'Fallback_Environment_Hemi';
       scene.add(fallbackLight);
       return { ok: false, message: 'Chưa có HDRI (' + url + '), dùng ánh sáng môi trường chuẩn.' };

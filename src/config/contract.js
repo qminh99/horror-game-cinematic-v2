@@ -1,6 +1,6 @@
 export const GAME_CONFIG = {
   playIntroOnStart: false,
-  enableBloomByDefault: false
+  enableBloomByDefault: true
 };
 
 export const ASSET_PATHS = {

@@ -76,6 +76,9 @@ export function createAssetLoader() {
         } else if (node.isLight) {
           lightCount += 1;
           node.castShadow = false;
+          if (node.isDirectionalLight) {
+            node.intensity *= 0.25;
+          }
         }
       });
 
