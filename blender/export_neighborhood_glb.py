@@ -57,6 +57,7 @@ def export_neighborhood():
         export_format='GLB',
         export_yup=True,
         export_cameras=False,
+        export_extras=True,
         export_lights=True,
         export_import_convert_lighting_mode='COMPAT',
         export_animations=False,

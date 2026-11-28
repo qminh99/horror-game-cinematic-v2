@@ -100,14 +100,17 @@ export function createNeighborhoodWorld(scene) {
           }
         });
         const label = node.userData.label || ('Đèn ' + formatFriendlyName(node.name, NEIGHBORHOOD_CONTRACT.switchPrefix, 'Phòng'));
+        const resolveTarget = (target) => typeof target === 'string' ? root.getObjectByName(target) : target;
+        const targetLight = resolveTarget(node.userData.targetLight);
+        const targetBulb = resolveTarget(node.userData.targetBulb);
         switches.push({
           type: 'switch',
           node: node,
           meshes: meshes,
           label: label,
-          targetLight: node.userData.targetLight || null,
-          targetBulb: node.userData.targetBulb || null,
-          baseLightIntensity: node.userData.targetLight ? node.userData.targetLight.intensity : 0,
+          targetLight: targetLight || null,
+          targetBulb: targetBulb || null,
+          baseLightIntensity: targetLight ? targetLight.intensity : 0,
           isOn: node.userData.isOn !== undefined ? Boolean(node.userData.isOn) : true
         });
         return;
