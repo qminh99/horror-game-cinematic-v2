@@ -73,7 +73,9 @@ let introReady = false;
 
 async function bootstrap() {
   const logs = [];
+  const audioLoading = introAudio.preloadAll();
 
+  assetStatusEl.textContent = 'Đang tải ánh sáng môi trường…';
   const hdriResult = await cinematicRenderer.loadEnvironmentHdri(ASSET_PATHS.nightHdri);
   if (hdriResult.ok) {
     logs.push('[OK] ' + hdriResult.message);
@@ -81,6 +83,7 @@ async function bootstrap() {
     logs.push('[WARN] ' + hdriResult.message);
   }
 
+  assetStatusEl.textContent = [...logs, 'Đang tải và giải mã mô hình intro…'].join('\n');
   const introLoad = await assetLoader.loadGlb(ASSET_PATHS.introMaster);
   if (introLoad.ok) {
     const report = assetLoader.validateContract(introLoad.gltf, INTRO_CONTRACT);
@@ -98,11 +101,15 @@ async function bootstrap() {
       }
     }
   } else {
-    logs.push('[MISSING] Chưa có ' + ASSET_PATHS.introMaster);
-    logs.push('  -> Giao Codex chạy Blender pipeline theo docs/CODEX_HANDOFF.md để xuất file này.');
+    logs.push('[LỖI] Không nạp được ' + ASSET_PATHS.introMaster);
+    logs.push(String(introLoad.error));
   }
 
-  const audioResults = await introAudio.preloadAll();
+  assetStatusEl.textContent = [...logs, '[INFO] Đang tải âm thanh intro…'].join('\n');
+  startBtn.textContent = introReady ? 'BẮT ĐẦU INTRO' : 'KHÔNG TẢI ĐƯỢC INTRO';
+  startBtn.disabled = !introReady;
+
+  const audioResults = await audioLoading;
   let audioLoadedCount = 0;
   for (let i = 0; i < audioResults.length; i++) {
     if (audioResults[i].ok) {
@@ -112,14 +119,6 @@ async function bootstrap() {
   logs.push('[INFO] Âm thanh intro đã nạp: ' + audioLoadedCount + '/' + audioResults.length + ' track.');
 
   assetStatusEl.textContent = logs.join('\n');
-
-  if (introReady) {
-    startBtn.textContent = 'BẮT ĐẦU INTRO';
-    startBtn.disabled = false;
-  } else {
-    startBtn.textContent = 'CHỜ CODEX XUẤT INTRO_MASTER.GLB';
-    startBtn.disabled = true;
-  }
 }
 
 startBtn.addEventListener('click', function () {

@@ -1,11 +1,21 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+import dracoDecoderJs from 'three/examples/jsm/libs/draco/gltf/draco_decoder.js?url';
+import dracoDecoderWasm from 'three/examples/jsm/libs/draco/gltf/draco_decoder.wasm?url';
+import dracoWasmWrapper from 'three/examples/jsm/libs/draco/gltf/draco_wasm_wrapper.js?url';
+
+const DRACO_FILES = new Map([
+  ['draco_decoder.js', dracoDecoderJs],
+  ['draco_decoder.wasm', dracoDecoderWasm],
+  ['draco_wasm_wrapper.js', dracoWasmWrapper]
+]);
 
 export function createAssetLoader() {
   const gltfLoader = new GLTFLoader();
-  const dracoLoader = new DRACOLoader();
-  dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.7/');
+  const dracoManager = new THREE.LoadingManager();
+  dracoManager.setURLModifier((url) => DRACO_FILES.get(url) ?? url);
+  const dracoLoader = new DRACOLoader(dracoManager);
   gltfLoader.setDRACOLoader(dracoLoader);
 
   function optimizeMaterial(material) {

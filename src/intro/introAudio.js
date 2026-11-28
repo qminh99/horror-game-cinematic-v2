@@ -7,6 +7,7 @@ export function createIntroAudio(camera) {
 
   const audioLoader = new THREE.AudioLoader();
   const tracks = {};
+  let ambienceActive = false;
   let fallbackCtx = null;
 
   function loadTrack(key, url, loop, volume) {
@@ -19,6 +20,9 @@ export function createIntroAudio(camera) {
           sound.setLoop(loop);
           sound.setVolume(volume);
           tracks[key] = sound;
+          if (loop && ambienceActive) {
+            sound.play();
+          }
           resolve({ key: key, ok: true });
         },
         undefined,
@@ -52,6 +56,7 @@ export function createIntroAudio(camera) {
   }
 
   function startAmbience() {
+    ambienceActive = true;
     if (listener.context.state === 'suspended') {
       listener.context.resume();
     }
@@ -109,6 +114,7 @@ export function createIntroAudio(camera) {
   }
 
   function stopAll() {
+    ambienceActive = false;
     const keys = Object.keys(tracks);
     for (let i = 0; i < keys.length; i++) {
       const sound = tracks[keys[i]];
